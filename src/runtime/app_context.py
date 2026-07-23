@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any
 
 from services.config_service import ConfigService
 
@@ -15,4 +14,3 @@ class AppContext:
 
     logger: logging.Logger
     config_service: ConfigService
-    main_window: Any | None = None

@@ -6,7 +6,6 @@ import logging
 from datetime import date
 from pathlib import Path
 
-
 LOG_FORMAT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
 
 

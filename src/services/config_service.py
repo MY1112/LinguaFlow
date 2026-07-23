@@ -6,12 +6,15 @@ import json
 from pathlib import Path
 from typing import Any
 
+from core.logger import get_logger
+
 
 class ConfigService:
-    """Loads application settings and hotkey configuration from one directory."""
+    """Load, read, and save application configuration."""
 
     def __init__(self, config_directory: Path) -> None:
         self.config_directory = Path(config_directory)
+        self._logger = get_logger(__name__)
         self._settings = self._load_json("settings.json", {"app": {"name": "LinguaFlow"}})
         self._hotkeys = self._load_json("hotkey.json", {})
 
@@ -32,6 +35,24 @@ class ConfigService:
             value = value[part]
         return value
 
+    def set(self, key: str, value: Any) -> None:
+        """Set a setting using a dotted key such as ``app.name``."""
+        parts = key.split(".")
+        target = self._settings
+        for part in parts[:-1]:
+            child = target.get(part)
+            if not isinstance(child, dict):
+                child = {}
+                target[part] = child
+            target = child
+        target[parts[-1]] = value
+
+    def save(self) -> None:
+        """Persist settings and hotkeys to the configured directory."""
+        self.config_directory.mkdir(parents=True, exist_ok=True)
+        self._save_json("settings.json", self._settings)
+        self._save_json("hotkey.json", self._hotkeys)
+
     def _load_json(self, filename: str, default: dict[str, Any]) -> dict[str, Any]:
         path = self.config_directory / filename
         if not path.exists():
@@ -39,6 +60,17 @@ class ConfigService:
         try:
             with path.open("r", encoding="utf-8") as file:
                 data = json.load(file)
-        except (OSError, json.JSONDecodeError):
+        except (OSError, json.JSONDecodeError) as error:
+            self._logger.warning("Unable to load configuration %s: %s", path, error)
             return default.copy()
         return data if isinstance(data, dict) else default.copy()
+
+    def _save_json(self, filename: str, data: dict[str, Any]) -> None:
+        path = self.config_directory / filename
+        try:
+            with path.open("w", encoding="utf-8") as file:
+                json.dump(data, file, ensure_ascii=False, indent=2)
+                file.write("\n")
+        except OSError as error:
+            self._logger.error("Unable to save configuration %s: %s", path, error)
+            raise
