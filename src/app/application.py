@@ -19,6 +19,7 @@ from services.model_service import ModelService
 from services.prompt_service import PromptService
 from ui.main_window import MainWindow
 from ui.popup_window import PopupWindow
+from ui.styles.stylesheet import build_stylesheet
 from ui.tray import Tray
 from ui.workers.translation_worker import TranslationWorker
 
@@ -28,6 +29,10 @@ class Application(QObject):
 
     def __init__(self) -> None:
         super().__init__()
+        self.application = QApplication(sys.argv)
+        self.application.setQuitOnLastWindowClosed(False)
+        self.application.setStyleSheet(build_stylesheet())
+
         project_root = Path(__file__).resolve().parents[2]
         logger = configure_logging(project_root / "logs")
         config_service = ConfigService(project_root / "config")
@@ -39,8 +44,6 @@ class Application(QObject):
             model_service=model_service,
             config_service=config_service,
         )
-        self.application = QApplication(sys.argv)
-        self.application.setQuitOnLastWindowClosed(False)
         self.context = AppContext(
             logger=logger,
             config_service=config_service,
@@ -142,12 +145,12 @@ class Application(QObject):
         thread.start()
 
     def _on_selection_translation_finished(self, result: str) -> None:
-        """接收 Worker 的成功结果并显示 Popup。"""
+        """接收 Worker 成功结果并显示 Popup。"""
         self.context.logger.info("划词翻译完成")
         self.popup_window.show_result(result)
 
     def _on_selection_translation_failed(self, message: str) -> None:
-        """记录详细错误，并显示统一的失败提示。"""
+        """记录详细错误并显示统一的失败提示。"""
         self.context.logger.error("划词翻译失败：%s", message)
         self.popup_window.show_result("翻译失败")
 
