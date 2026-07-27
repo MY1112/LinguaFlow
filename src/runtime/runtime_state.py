@@ -1,4 +1,4 @@
-"""State container for the AI runtime."""
+"""AI Runtime 状态容器。"""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from pathlib import Path
 
 @dataclass
 class RuntimeState:
-    """Runtime state without model or business-specific data."""
+    """不包含模型或业务专属数据的 Runtime 状态。"""
 
     initialized: bool = False
     model_loaded: bool = False

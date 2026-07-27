@@ -1,4 +1,4 @@
-"""System tray integration for the desktop application."""
+"""桌面应用的系统托盘集成。"""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QMenu, QApplication, QStyle, QSystemTrayIcon
 
 
 class Tray(QObject):
-    """System tray icon and menu without knowledge of the main window."""
+    """提供系统托盘图标和菜单，不感知主窗口实现。"""
 
     show_requested = Signal()
     quit_requested = Signal()
@@ -21,11 +21,11 @@ class Tray(QObject):
         self.tray_icon.activated.connect(self._handle_activation)
 
     def show(self) -> None:
-        """Show the system tray icon."""
+        """显示系统托盘图标。"""
         self.tray_icon.show()
 
     def hide(self) -> None:
-        """Hide the system tray icon."""
+        """隐藏系统托盘图标。"""
         self.tray_icon.hide()
 
     def _create_icon(self) -> QIcon:

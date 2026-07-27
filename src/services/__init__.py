@@ -1,1 +1,1 @@
-"""Shared application services."""
+"""共享应用服务包。"""

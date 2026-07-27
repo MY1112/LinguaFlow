@@ -1,1 +1,1 @@
-"""Third-party integration adapters."""
+"""第三方集成适配包。"""

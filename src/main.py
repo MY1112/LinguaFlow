@@ -1,4 +1,4 @@
-"""LinguaFlow application entry point."""
+"""LinguaFlow 应用程序入口。"""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from app.application import Application
 
 
 def main() -> int:
-    """Run the desktop application."""
+    """运行桌面应用程序。"""
     return Application().run()
 
 

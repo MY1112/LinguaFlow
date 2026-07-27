@@ -12,18 +12,13 @@ from core.logger import get_logger
 class PromptService:
     """集中构建当前阶段支持的中英文翻译 Prompt。"""
 
-    _PROMPT_TEMPLATE: Final[str] = """你是一名专业翻译助手。
-
-请将下面内容从{source_language}翻译为{target_language}。
-
-要求：
-1. 保持原意。
-2. 保持语气。
-3. 不添加解释。
-4. 仅输出翻译结果。
-
-内容：
-{text}"""
+    _PROMPT_TEMPLATE: Final[str] = """<|im_start|>system
+你是一名专业翻译助手。请将用户文本从{source_language}翻译为{target_language}。
+仅输出翻译结果，不要输出解释、标签、备注或重复内容。<|im_end|>
+<|im_start|>user
+{text}<|im_end|>
+<|im_start|>assistant
+"""
 
     _LANGUAGE_ALIASES: Final[dict[str, str]] = {
         "中文": "中文",

@@ -1,4 +1,4 @@
-"""Model lifecycle and inference service."""
+"""模型生命周期和推理服务。"""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from integrations.llama_cpp import LlamaCppAdapter
 
 
 class ModelService:
-    """Provide the application's single business-level model interface."""
+    """提供应用唯一的业务层模型接口。"""
 
     def __init__(
         self,
@@ -23,28 +23,28 @@ class ModelService:
         self._adapter = adapter or LlamaCppAdapter(self._logger)
 
     def load_model(self, model_path: str) -> bool:
-        """Load a model through the llama.cpp adapter."""
-        self._logger.info("Loading model: %s", model_path)
+        """通过 llama.cpp 适配器加载模型。"""
+        self._logger.info("正在加载模型：%s", model_path)
         try:
             loaded = self._adapter.load_model(Path(model_path))
         except LlamaCppAdapterError as error:
-            self._logger.error("Model load failed: %s", error)
+            self._logger.error("模型加载失败：%s", error)
             raise ModelServiceError(f"Model load failed: {model_path}") from error
-        self._logger.info("Model loaded: %s", model_path)
+        self._logger.info("模型加载完成：%s", model_path)
         return loaded
 
     def unload_model(self) -> None:
-        """Unload the current model through the adapter."""
-        self._logger.info("Unloading model")
+        """通过适配器卸载当前模型。"""
+        self._logger.info("正在卸载模型")
         try:
             self._adapter.unload_model()
         except LlamaCppAdapterError as error:
-            self._logger.error("Model unload failed: %s", error)
+            self._logger.error("模型卸载失败：%s", error)
             raise ModelServiceError("Model unload failed") from error
-        self._logger.info("Model unloaded")
+        self._logger.info("模型卸载完成")
 
     def is_loaded(self) -> bool:
-        """Return whether the adapter currently has a loaded model."""
+        """返回适配器当前是否已加载模型。"""
         return self._adapter.is_loaded()
 
     def generate(
@@ -53,10 +53,10 @@ class ModelService:
         *,
         temperature: float = 0.2,
         top_p: float = 0.9,
-        max_tokens: int = 512,
+        max_tokens: int = 128,
     ) -> str:
-        """Generate text with default inference parameters."""
-        self._logger.info("Inference started")
+        """使用默认推理参数生成文本。"""
+        self._logger.info("推理开始")
         try:
             raw_output = self._adapter.generate(
                 prompt,
@@ -66,12 +66,12 @@ class ModelService:
             )
             output = self._extract_text(raw_output)
         except LlamaCppAdapterError as error:
-            self._logger.error("Inference failed: %s", error)
+            self._logger.error("推理失败：%s", error)
             raise ModelServiceError("Inference failed") from error
         except (KeyError, IndexError, TypeError, ValueError) as error:
-            self._logger.error("Invalid model output: %s", error)
+            self._logger.error("模型输出无效：%s", error)
             raise ModelServiceError("Invalid model output") from error
-        self._logger.info("Inference finished")
+        self._logger.info("推理结束")
         return output
 
     def _extract_text(self, raw_output: Any) -> str:

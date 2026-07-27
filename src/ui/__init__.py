@@ -1,1 +1,1 @@
-"""Shared user interface package."""
+"""共享用户界面包。"""

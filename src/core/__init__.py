@@ -1,1 +1,1 @@
-"""Shared core capabilities."""
+"""核心公共能力包。"""

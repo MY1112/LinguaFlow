@@ -1,1 +1,1 @@
-"""Application runtime state."""
+"""应用运行时状态包。"""

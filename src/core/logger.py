@@ -1,4 +1,4 @@
-"""Centralized application logging."""
+"""集中管理应用日志。"""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ LOG_FORMAT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
 
 
 def configure_logging(log_directory: Path, level: int = logging.INFO) -> logging.Logger:
-    """Configure and return the application logger."""
+    """配置并返回应用日志记录器。"""
     log_directory.mkdir(parents=True, exist_ok=True)
     logger = logging.getLogger("linguaflow")
     logger.setLevel(level)
@@ -34,5 +34,5 @@ def configure_logging(log_directory: Path, level: int = logging.INFO) -> logging
 
 
 def get_logger(name: str | None = None) -> logging.Logger:
-    """Return a child logger after application logging has been configured."""
+    """在日志配置完成后返回子日志记录器。"""
     return logging.getLogger("linguaflow" if not name else f"linguaflow.{name}")

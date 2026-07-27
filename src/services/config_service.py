@@ -1,4 +1,4 @@
-"""Application configuration access."""
+"""应用配置访问服务。"""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from core.logger import get_logger
 
 
 class ConfigService:
-    """Load, read, and save application configuration."""
+    """负责加载、读取和保存应用配置。"""
 
     def __init__(self, config_directory: Path) -> None:
         self.config_directory = Path(config_directory)
@@ -27,7 +27,7 @@ class ConfigService:
         return self._hotkeys
 
     def get(self, key: str, default: Any = None) -> Any:
-        """Read a setting using a dotted key such as ``app.name``."""
+        """使用点号键读取配置，例如 ``app.name``。"""
         value: Any = self._settings
         for part in key.split("."):
             if not isinstance(value, dict) or part not in value:
@@ -36,7 +36,7 @@ class ConfigService:
         return value
 
     def set(self, key: str, value: Any) -> None:
-        """Set a setting using a dotted key such as ``app.name``."""
+        """使用点号键设置配置，例如 ``app.name``。"""
         parts = key.split(".")
         target = self._settings
         for part in parts[:-1]:
@@ -48,7 +48,7 @@ class ConfigService:
         target[parts[-1]] = value
 
     def save(self) -> None:
-        """Persist settings and hotkeys to the configured directory."""
+        """将设置和快捷键配置持久化到配置目录。"""
         self.config_directory.mkdir(parents=True, exist_ok=True)
         self._save_json("settings.json", self._settings)
         self._save_json("hotkey.json", self._hotkeys)
@@ -61,7 +61,7 @@ class ConfigService:
             with path.open("r", encoding="utf-8") as file:
                 data = json.load(file)
         except (OSError, json.JSONDecodeError) as error:
-            self._logger.warning("Unable to load configuration %s: %s", path, error)
+            self._logger.warning("无法加载配置 %s：%s", path, error)
             return default.copy()
         return data if isinstance(data, dict) else default.copy()
 
@@ -72,5 +72,5 @@ class ConfigService:
                 json.dump(data, file, ensure_ascii=False, indent=2)
                 file.write("\n")
         except OSError as error:
-            self._logger.error("Unable to save configuration %s: %s", path, error)
+            self._logger.error("无法保存配置 %s：%s", path, error)
             raise

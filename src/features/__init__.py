@@ -1,1 +1,1 @@
-"""Feature package reserved for future functionality."""
+"""预留的功能包。"""
