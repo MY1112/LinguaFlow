@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QAction, QIcon
-from PySide6.QtWidgets import QMenu, QApplication, QStyle, QSystemTrayIcon
+from PySide6.QtWidgets import QMenu, QSystemTrayIcon
+from ui.resources.assets import get_favicon
 
 
 class Tray(QObject):
@@ -29,8 +30,7 @@ class Tray(QObject):
         self.tray_icon.hide()
 
     def _create_icon(self) -> QIcon:
-        style = QApplication.style()
-        return style.standardIcon(QStyle.StandardPixmap.SP_ComputerIcon)
+        return QIcon(str(get_favicon()))
 
     def _create_menu(self) -> QMenu:
         menu = QMenu()

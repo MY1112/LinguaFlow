@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import logging
 
-from PySide6.QtCore import QThread, Qt, Signal
-from PySide6.QtGui import QCloseEvent, QKeySequence, QShortcut
+from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtGui import QCloseEvent, QIcon, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -25,6 +25,7 @@ from ui.components.lf_header import LFHeader
 from ui.components.lf_input import LFInput
 from ui.components.lf_select import LFSelect
 from ui.components.lf_status import LFStatus
+from ui.resources.assets import get_favicon, get_icon
 from ui.theme.theme import COLORS, SPACING
 from ui.workers.translation_worker import TranslationWorker
 
@@ -45,6 +46,7 @@ class MainWindow(QMainWindow):
         self._translation_thread: QThread | None = None
         self._translation_worker: TranslationWorker | None = None
         self.setWindowTitle("LinguaFlow")
+        self.setWindowIcon(QIcon(str(get_favicon())))
         self.resize(420, 620)
         self.setMinimumSize(420, 520)
         self._build_ui()
@@ -83,8 +85,10 @@ class MainWindow(QMainWindow):
         self.source_language = LFSelect(["中文", "English"], area)
         self.target_language = LFSelect(["中文", "English"], area)
         self.target_language.setCurrentIndex(1)
-        self.swap_button = LFButton("<->", variant="ghost")
-        self.swap_button.setFixedSize(40, 40)
+        self.swap_button = LFButton(
+            "", variant="ghost", icon_path=get_icon("swap"), icon_size=(16, 16)
+        )
+        self.swap_button.setFixedSize(40, 36)
         self.swap_button.clicked.connect(self._swap_languages)
         layout.addWidget(self.source_language)
         layout.addWidget(self.swap_button)
@@ -98,22 +102,27 @@ class MainWindow(QMainWindow):
         card_layout = self.input_card.layout()
         if card_layout is None:
             raise RuntimeError("Input card layout is missing")
-        heading = QHBoxLayout()
-        self.input_title = QLabel("Input Text", self.input_card)
-        self.input_title.setStyleSheet(f"color: {COLORS.text}; font-size: 14px; font-weight: 600;")
-        self.character_count = QLabel("0 / 5000", self.input_card)
-        self.character_count.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.character_count.setStyleSheet(f"color: {COLORS.secondary_text}; font-size: 12px;")
-        heading.addWidget(self.input_title)
-        heading.addStretch()
-        heading.addWidget(self.character_count)
-        card_layout.addLayout(heading)
+
         self.source_text_edit = LFInput(max_length=5000)
         self.source_text_edit.setPlaceholderText("Enter text to translate...")
-        self.source_text_edit.setFixedHeight(92)
+        self.source_text_edit.setFixedHeight(84)
         self.source_text_edit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.source_text_edit.textChanged.connect(self._update_character_count)
         card_layout.addWidget(self.source_text_edit)
+
+        footer = QHBoxLayout()
+        self.character_count = QLabel("0 / 5000", self.input_card)
+        self.character_count.setMaximumHeight(20)
+        self.character_count.setAlignment(
+            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+        )
+        self.character_count.setStyleSheet(
+            f"color: {COLORS.secondary_text}; font-size: 12px;background-color: {COLORS.surface};"
+        )
+        footer.addStretch()
+        footer.addWidget(self.character_count)
+        card_layout.addLayout(footer)
+
         return self.input_card
 
     def _build_translate_button(self, parent: QWidget) -> QWidget:
@@ -136,14 +145,14 @@ class MainWindow(QMainWindow):
             raise RuntimeError("Result card layout is missing")
         heading = QHBoxLayout()
         self.result_title = QLabel("Translation Result", self.result_card)
-        self.result_title.setStyleSheet(f"color: {COLORS.text}; font-size: 14px; font-weight: 600;")
+        self.result_title.setStyleSheet(f"color: {COLORS.text}; font-size: 15px; font-weight: 600;")
         heading.addWidget(self.result_title)
         heading.addStretch()
         card_layout.addLayout(heading)
         self.target_text_edit = QPlainTextEdit(self.result_card)
         self.target_text_edit.setReadOnly(True)
         self.target_text_edit.setPlaceholderText("Your translation will appear here...")
-        self.target_text_edit.setFixedHeight(72)
+        self.target_text_edit.setFixedHeight(64)
         self.target_text_edit.setStyleSheet(f"""
             QPlainTextEdit {{
                 background-color: {COLORS.surface};

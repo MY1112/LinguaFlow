@@ -1,12 +1,15 @@
-"""LinguaFlow 应用程序入口。"""
+"""LinguaFlow application entry point."""
 
 from __future__ import annotations
 
-from app.application import Application
+from app.windows_identity import set_app_user_model_id
 
 
 def main() -> int:
-    """运行桌面应用程序。"""
+    """Set the Windows identity before creating the Qt application."""
+    set_app_user_model_id()
+    from app.application import Application
+
     return Application().run()
 
 

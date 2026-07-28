@@ -15,3 +15,16 @@ def get_logo(size: int) -> Path:
 
     project_root = Path(__file__).resolve().parents[3]
     return project_root / "assets" / f"logo_{size}.png"
+
+def get_favicon() -> Path:
+    """返回 favicon 资源路径。"""
+    project_root = Path(__file__).resolve().parents[3]
+    return project_root / "assets" / "favicon.ico"
+
+def get_icon(name: str) -> Path:
+    """返回指定名称的图标资源路径。"""
+    project_root = Path(__file__).resolve().parents[3]
+    icon_path = project_root / "assets" / "icons" / f"{name}.png"
+    if not icon_path.exists():
+        raise FileNotFoundError(f"图标资源未找到: {icon_path}")
+    return icon_path

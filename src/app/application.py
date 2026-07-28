@@ -7,6 +7,7 @@ from pathlib import Path
 
 from PySide6.QtCore import QObject, QThread, QTimer
 from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QIcon
 
 from core.logger import configure_logging
 from features.translation.translation_feature import TranslationFeature
@@ -22,6 +23,7 @@ from ui.popup_window import PopupWindow
 from ui.styles.stylesheet import build_stylesheet
 from ui.tray import Tray
 from ui.workers.translation_worker import TranslationWorker
+from ui.resources.assets import get_favicon
 
 
 class Application(QObject):
@@ -32,6 +34,7 @@ class Application(QObject):
         self.application = QApplication(sys.argv)
         self.application.setQuitOnLastWindowClosed(False)
         self.application.setStyleSheet(build_stylesheet())
+        self.application.setWindowIcon(QIcon(str(get_favicon())))
 
         project_root = Path(__file__).resolve().parents[2]
         logger = configure_logging(project_root / "logs")

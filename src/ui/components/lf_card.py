@@ -1,25 +1,28 @@
-"""LinguaFlow 统一卡片容器。"""
+"""LinguaFlow shared card component."""
 
 from __future__ import annotations
 
-from PySide6.QtWidgets import QFrame, QVBoxLayout, QWidget
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QFrame, QGraphicsDropShadowEffect, QVBoxLayout, QWidget
 
 from ui.theme.theme import COLORS, RADIUS, SPACING
 
 
 class LFCard(QFrame):
-    """提供统一背景、圆角和内边距的卡片容器。"""
+    """Provide the shared card surface, padding, radius and shadow."""
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.setObjectName("LFCard")
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(
-            SPACING.lg - SPACING.xs,
-            SPACING.lg - SPACING.xs,
-            SPACING.lg - SPACING.xs,
-            SPACING.lg - SPACING.xs,
-        )
+        layout.setContentsMargins(SPACING.md, SPACING.md, SPACING.md, SPACING.md)
+        shadow = QGraphicsDropShadowEffect(self)
+        shadow.setBlurRadius(16)
+        shadow.setOffset(0, 4)
+        shadow_color = QColor(COLORS.text)
+        shadow_color.setAlpha(13)
+        shadow.setColor(shadow_color)
+        self.setGraphicsEffect(shadow)
         self.setStyleSheet(f"""
             QFrame#LFCard {{
                 background-color: {COLORS.surface};
