@@ -15,6 +15,9 @@ class Colors:
     text: str = "#1A1D23"
     secondary_text: str = "#6B7280"
     border: str = "#E9EDF3"
+    scrollbar_thumb: str = "#CAD5E5"
+    scrollbar_thumb_hover: str = "#BAC7D9"
+    scrollbar_thumb_active: str = "#ABBBD1"
     success: str = "#84C97C"
     error: str = "#FF6B6B"
 

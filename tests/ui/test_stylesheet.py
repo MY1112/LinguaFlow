@@ -11,3 +11,8 @@ def test_build_stylesheet_returns_global_qt_stylesheet() -> None:
     assert "QWidget" in stylesheet
     assert "#F7F8FA" in stylesheet
     assert "#1A1D23" in stylesheet
+    assert "QScrollBar:vertical" in stylesheet
+    assert "QScrollBar::handle:vertical" in stylesheet
+    assert "QScrollBar::handle:horizontal" in stylesheet
+    assert "width: 10px" in stylesheet
+    assert "height: 10px" in stylesheet

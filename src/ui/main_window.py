@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtCore import QThread, Signal
 from PySide6.QtGui import QCloseEvent, QIcon, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -97,7 +97,7 @@ class MainWindow(QMainWindow):
         return area
 
     def _build_input_card(self, parent: QWidget) -> LFCard:
-        self.input_card = LFCard(parent)
+        self.input_card = LFCard(parent, padding=0)
         self.input_card.setFixedSize(372, 160)
         card_layout = self.input_card.layout()
         if card_layout is None:
@@ -105,23 +105,9 @@ class MainWindow(QMainWindow):
 
         self.source_text_edit = LFInput(max_length=5000)
         self.source_text_edit.setPlaceholderText("Enter text to translate...")
-        self.source_text_edit.setFixedHeight(84)
+        self.source_text_edit.setFixedHeight(160)
         self.source_text_edit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.source_text_edit.textChanged.connect(self._update_character_count)
         card_layout.addWidget(self.source_text_edit)
-
-        footer = QHBoxLayout()
-        self.character_count = QLabel("0 / 5000", self.input_card)
-        self.character_count.setMaximumHeight(20)
-        self.character_count.setAlignment(
-            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
-        )
-        self.character_count.setStyleSheet(
-            f"color: {COLORS.secondary_text}; font-size: 12px;background-color: {COLORS.surface};"
-        )
-        footer.addStretch()
-        footer.addWidget(self.character_count)
-        card_layout.addLayout(footer)
 
         return self.input_card
 
@@ -130,7 +116,9 @@ class MainWindow(QMainWindow):
         layout = QHBoxLayout(area)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addStretch()
-        self.translate_button = LFButton("Translate", variant="primary")
+        self.translate_button = LFButton(
+            "Translate", variant="primary", icon_path=get_icon("star"), icon_size=(16, 16)
+        )
         self.translate_button.setFixedSize(240, 44)
         self.translate_button.clicked.connect(self._translate)
         layout.addWidget(self.translate_button)
@@ -164,11 +152,15 @@ class MainWindow(QMainWindow):
         card_layout.addWidget(self.target_text_edit)
         actions = QHBoxLayout()
         actions.addStretch()
-        self.copy_button = LFButton("Copy", variant="secondary")
-        self.copy_button.setFixedSize(80, 32)
+        self.copy_button = LFButton(
+            "", variant="ghost", icon_path=get_icon("copy"), icon_size=(16, 16)
+        )
+        self.copy_button.setFixedSize(32, 32)
         self.copy_button.clicked.connect(self._copy_result)
-        self.sound_button = LFButton("Sound", variant="secondary")
-        self.sound_button.setFixedSize(80, 32)
+        self.sound_button = LFButton(
+            "", variant="ghost", icon_path=get_icon("audio"), icon_size=(16, 16)
+        )
+        self.sound_button.setFixedSize(32, 32)
         self.sound_button.setEnabled(False)
         actions.addWidget(self.copy_button)
         actions.addWidget(self.sound_button)
@@ -192,10 +184,6 @@ class MainWindow(QMainWindow):
         target_index = self.target_language.currentIndex()
         self.source_language.setCurrentIndex(target_index)
         self.target_language.setCurrentIndex(source_index)
-
-    def _update_character_count(self) -> None:
-        count = len(self.source_text_edit.toPlainText())
-        self.character_count.setText(f"{count} / {self.source_text_edit.maximum_length}")
 
     def _copy_result(self) -> None:
         from PySide6.QtWidgets import QApplication

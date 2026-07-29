@@ -31,6 +31,7 @@ def test_main_window_matches_product_layout(qt_application: QApplication) -> Non
     assert window.source_language.currentText() == "中文"
     assert window.target_language.currentText() == "English"
     assert window.source_text_edit.maximum_length == 5000
+    assert window.source_text_edit.parent() is window.input_card
     assert window.translate_button.text() == "Translate"
     assert window.result_title.text() == "Translation Result"
     assert window.model_status.text == "Model Ready"
@@ -60,5 +61,5 @@ def test_main_window_updates_character_count(qt_application: QApplication) -> No
 
     window.source_text_edit.setPlainText("hello")
 
-    assert window.character_count.text() == "5 / 5000"
+    assert window.source_text_edit.count_label.text() == "5 / 5000"
     window.close()

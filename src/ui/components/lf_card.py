@@ -11,11 +11,11 @@ from ui.theme.theme import COLORS, RADIUS, SPACING
 class LFCard(QFrame):
     """Provide the shared card surface, padding, radius and shadow."""
 
-    def __init__(self, parent: QWidget | None = None) -> None:
+    def __init__(self, parent: QWidget | None = None, padding: int | None = SPACING.md) -> None:
         super().__init__(parent)
         self.setObjectName("LFCard")
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(SPACING.md, SPACING.md, SPACING.md, SPACING.md)
+        layout.setContentsMargins(padding, padding, padding, padding)
         shadow = QGraphicsDropShadowEffect(self)
         shadow.setBlurRadius(16)
         shadow.setOffset(0, 4)
