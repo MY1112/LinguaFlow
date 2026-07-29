@@ -74,5 +74,6 @@ def test_show_result_starts_auto_hide_timer(qt_application: QApplication) -> Non
 
     assert popup.hide_timer.isActive()
     assert popup.hide_timer.interval() == popup.HIDE_DELAY_MS
+    assert popup.HIDE_DELAY_MS == 5000
 
     popup.close()

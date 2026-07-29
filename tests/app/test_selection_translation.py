@@ -74,3 +74,15 @@ def test_translation_success_shows_result_in_popup() -> None:
     application._on_selection_translation_finished("Hello")
 
     application.popup_window.show_result.assert_called_once_with("Hello")
+
+
+def test_translation_success_passes_source_text_to_popup() -> None:
+    """Selection translation should show the selected source alongside its result."""
+    application = Application.__new__(Application)
+    application.popup_window = Mock()
+    application.context = SimpleNamespace(logger=Mock())
+    application._selection_source_text = "Hello"
+
+    application._on_selection_translation_finished("你好")
+
+    application.popup_window.show_result.assert_called_once_with("你好", "Hello")

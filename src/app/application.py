@@ -64,6 +64,7 @@ class Application(QObject):
         )
         self.selection_adapter = SelectionAdapter(logger)
         self._selection_translation_thread: QThread | None = None
+        self._selection_source_text = ""
         self._selection_translation_worker: TranslationWorker | None = None
         self._connect_signals()
 
@@ -125,6 +126,7 @@ class Application(QObject):
             self.context.logger.warning("已有划词翻译任务正在执行")
             return
 
+        self._selection_source_text = text
         thread = QThread(self.application)
         worker = TranslationWorker(
             self.translation_feature,
@@ -150,12 +152,20 @@ class Application(QObject):
     def _on_selection_translation_finished(self, result: str) -> None:
         """接收 Worker 成功结果并显示 Popup。"""
         self.context.logger.info("划词翻译完成")
-        self.popup_window.show_result(result)
+        source_text = getattr(self, "_selection_source_text", "")
+        if source_text:
+            self.popup_window.show_result(result, source_text)
+        else:
+            self.popup_window.show_result(result)
 
     def _on_selection_translation_failed(self, message: str) -> None:
         """记录详细错误并显示统一的失败提示。"""
         self.context.logger.error("划词翻译失败：%s", message)
-        self.popup_window.show_result("翻译失败")
+        source_text = getattr(self, "_selection_source_text", "")
+        if source_text:
+            self.popup_window.show_result("翻译失败", source_text)
+        else:
+            self.popup_window.show_result("翻译失败")
 
     def _clear_selection_translation(self) -> None:
         """清理已完成的划词翻译 Worker 引用。"""

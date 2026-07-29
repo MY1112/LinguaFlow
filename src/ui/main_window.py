@@ -177,6 +177,12 @@ class MainWindow(QMainWindow):
         layout.addWidget(QLabel("Qwen2.5-3B", status_bar))
         layout.addStretch()
         layout.addWidget(QLabel("Alt + Q", status_bar))
+        layout.addStretch()
+        self.setting_button = LFButton(
+            "", variant="ghost", icon_path=get_icon("setting"), icon_size=(16, 16)
+        )
+        self.setting_button.setFixedSize(16, 16)
+        layout.addWidget(self.setting_button)
         return status_bar
 
     def _swap_languages(self) -> None:

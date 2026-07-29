@@ -299,7 +299,7 @@ Logo：
 
 文字：
 
-LinguaFlow
+Translation
 
 
 
@@ -471,7 +471,7 @@ Fade Out
 
 默认：
 
-3秒
+5秒
 
 
 
