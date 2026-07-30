@@ -83,3 +83,39 @@ def test_popup_pauses_and_resumes_auto_hide_on_mouse_presence(
     assert popup.hide_timer.isActive()
 
     popup.close()
+
+
+def test_popup_loading_state_shows_immediately_and_disables_actions(
+    qt_application: QApplication,
+) -> None:
+    """Loading state should show source text and prevent stale actions."""
+    popup = PopupWindow(logging.getLogger("test.popup.loading"))
+
+    popup.show_loading("source text")
+
+    assert popup.state == "loading"
+    assert popup.result_label.text() == "正在翻译..."
+    assert popup.source_label.text() == "source text"
+    assert not popup.copy_button.isEnabled()
+    assert not popup.retry_button.isEnabled()
+    assert not popup.hide_timer.isActive()
+
+    popup.close()
+
+
+def test_popup_error_state_enables_retry(
+    qt_application: QApplication,
+) -> None:
+    """Error state should expose a retry action and preserve source text."""
+    popup = PopupWindow(logging.getLogger("test.popup.error"))
+
+    popup.show_error("翻译失败", "source text")
+
+    assert popup.state == "error"
+    assert popup.result_label.text() == "翻译失败"
+    assert popup.source_label.text() == "source text"
+    assert not popup.copy_button.isEnabled()
+    assert popup.retry_button.isEnabled()
+    assert popup.hide_timer.isActive()
+
+    popup.close()

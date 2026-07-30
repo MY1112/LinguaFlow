@@ -42,6 +42,7 @@ class PopupWindow(QWidget):
         super().__init__()
         self._logger = logger or get_logger(__name__)
         self._source_text = ""
+        self.state = "idle"
         self.hide_timer = QTimer(self)
         self.hide_timer.setSingleShot(True)
         self.hide_timer.timeout.connect(self._hide_popup)
@@ -50,6 +51,9 @@ class PopupWindow(QWidget):
     def show_result(self, text: str, source_text: str = "") -> None:
         """Display a translation result and start the auto-hide timer."""
         self._source_text = source_text
+        self.state = "success"
+        self.copy_button.setEnabled(True)
+        self.retry_button.setEnabled(True)
         self.source_label.setText(source_text)
         source_visible = bool(source_text.strip())
 
@@ -64,6 +68,44 @@ class PopupWindow(QWidget):
         self.hide_timer.start(self.HIDE_DELAY_MS)
         self.show()
         self._logger.info("Popup shown")
+
+    def show_loading(self, source_text: str = "") -> None:
+        """Show the popup immediately while translation is running."""
+        self._source_text = source_text
+        self.state = "loading"
+        self.source_label.setText(source_text)
+        source_visible = bool(source_text.strip())
+        self.source_label.setVisible(source_visible)
+        self.source_row.setVisible(source_visible)
+        self.result_label.setText("正在翻译...")
+        self.copy_button.setEnabled(False)
+        self.retry_button.setEnabled(False)
+        self.hide_timer.stop()
+        self._show_and_position()
+        self._logger.info("Popup loading shown")
+
+    def show_error(self, message: str, source_text: str = "") -> None:
+        """Show a recoverable translation error with retry enabled."""
+        self._source_text = source_text
+        self.state = "error"
+        self.source_label.setText(source_text)
+        source_visible = bool(source_text.strip())
+        self.source_label.setVisible(source_visible)
+        self.source_row.setVisible(source_visible)
+        self.result_label.setText(message)
+        self.copy_button.setEnabled(False)
+        self.retry_button.setEnabled(True)
+        self._show_and_position()
+        self.hide_timer.start(self.HIDE_DELAY_MS)
+        self._logger.info("Popup error shown")
+
+    def _show_and_position(self) -> None:
+        """Resize, position and show the popup without stealing focus."""
+        self.adjustSize()
+        self.setFixedWidth(self._clamp_width(self.width()))
+        self.adjustSize()
+        self._move_to_bottom_right()
+        self.show()
 
     def _build_ui(self) -> None:
         self.setObjectName("PopupWindow")
@@ -143,6 +185,7 @@ class PopupWindow(QWidget):
         )
         self.close_button.setFixedSize(16, 16)
         self.close_button.clicked.connect(self._hide_popup)
+        self.dismiss_button = self.close_button
         layout.addWidget(self.close_button)
         return header
 
@@ -187,7 +230,7 @@ class PopupWindow(QWidget):
         scroll_layout.addWidget(self.source_row)
 
         divider_container = QWidget(scroll_content)
-        divider_container.setStyleSheet(f"background-color: {COLORS.background};")
+        divider_container.setStyleSheet(f"background-color: {COLORS.surface};")
         divider_layout = QVBoxLayout(divider_container)
         divider_layout.setContentsMargins(0, SPACING.sm, 0, SPACING.sm)
         self.content_divider = QFrame(divider_container)
@@ -216,6 +259,7 @@ class PopupWindow(QWidget):
         )
         self.result_audio_button.setFixedSize(28, 28)
         self.result_audio_button.setEnabled(False)
+        self.sound_button = self.result_audio_button
         result_layout.addWidget(
             self.result_audio_button,
             0,
@@ -250,28 +294,23 @@ class PopupWindow(QWidget):
             }}
         """)
         layout = QHBoxLayout(actions)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.addStretch()
+        layout.setContentsMargins(12, 0, 12, 0)
         self.copy_button = LFButton(
-            "Copy", variant="secondary", icon_path=get_icon("copy"), icon_size=(16, 16)
+            "", variant="ghost", icon_path=get_icon("copy"), icon_size=(16, 16)
         )
+        self.copy_button.setFixedSize(32, 32)
         self.copy_button.clicked.connect(self._copy_result)
         self.retry_button = LFButton(
-            "Retry", variant="secondary", icon_path=get_icon("refresh"), icon_size=(16, 16)
+            "", variant="ghost", icon_path=get_icon("refresh"), icon_size=(16, 16)
         )
+        self.retry_button.setFixedSize(32, 32)
         self.retry_button.clicked.connect(self.retry_requested.emit)
-        self.sound_button = LFButton(
-            "Sound", variant="secondary", icon_path=get_icon("audio"), icon_size=(16, 16)
-        )
-        self.sound_button.setEnabled(False)
-        layout.addWidget(self.sound_button)
-        self.dismiss_button = LFButton(
-            "", variant="ghost", icon_path=get_icon("close"), icon_size=(16, 16)
-        )
-        self.dismiss_button.clicked.connect(self._hide_popup)
         layout.addWidget(self.copy_button)
         layout.addWidget(self.retry_button)
-        layout.addWidget(self.dismiss_button)
+        layout.addStretch()
+        self.close_hint_label = QLabel("按 Esc 关闭", actions)
+        self.close_hint_label.setStyleSheet(f"color: {COLORS.secondary_text}; font-size: 12px;")
+        layout.addWidget(self.close_hint_label)
         return actions
 
     def _copy_result(self) -> None:

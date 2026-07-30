@@ -61,7 +61,7 @@ def test_translation_failure_shows_generic_popup_and_logs_detail() -> None:
 
     application._on_selection_translation_failed("模型未加载")
 
-    application.popup_window.show_result.assert_called_once_with("翻译失败")
+    application.popup_window.show_error.assert_called_once_with("翻译失败")
     application.context.logger.error.assert_called_once()
 
 
@@ -86,3 +86,14 @@ def test_translation_success_passes_source_text_to_popup() -> None:
     application._on_selection_translation_finished("你好")
 
     application.popup_window.show_result.assert_called_once_with("你好", "Hello")
+
+
+def test_retry_restarts_translation_with_previous_source() -> None:
+    """Retry should submit the same selected text again."""
+    application = Application.__new__(Application)
+    application._selection_source_text = "Hello"
+    application._start_selection_translation = Mock()
+
+    application._retry_selection_translation()
+
+    application._start_selection_translation.assert_called_once_with("Hello")

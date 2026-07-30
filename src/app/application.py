@@ -88,6 +88,7 @@ class Application(QObject):
         self.main_window.close_requested.connect(self._hide_to_tray)
         self.tray.show_requested.connect(self._show_window)
         self.tray.quit_requested.connect(self._quit)
+        self.popup_window.retry_requested.connect(self._retry_selection_translation)
 
     def _hide_to_tray(self) -> None:
         self.main_window.hide()
@@ -127,6 +128,7 @@ class Application(QObject):
             return
 
         self._selection_source_text = text
+        self.popup_window.show_loading(text)
         thread = QThread(self.application)
         worker = TranslationWorker(
             self.translation_feature,
@@ -163,9 +165,15 @@ class Application(QObject):
         self.context.logger.error("划词翻译失败：%s", message)
         source_text = getattr(self, "_selection_source_text", "")
         if source_text:
-            self.popup_window.show_result("翻译失败", source_text)
+            self.popup_window.show_error("翻译失败", source_text)
         else:
-            self.popup_window.show_result("翻译失败")
+            self.popup_window.show_error("翻译失败")
+
+    def _retry_selection_translation(self) -> None:
+        """Restart translation for the last selected text after a failure."""
+        source_text = getattr(self, "_selection_source_text", "")
+        if source_text:
+            self._start_selection_translation(source_text)
 
     def _clear_selection_translation(self) -> None:
         """清理已完成的划词翻译 Worker 引用。"""
