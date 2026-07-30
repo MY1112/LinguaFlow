@@ -125,7 +125,7 @@ class SelectionAdapter(QObject):
             self._logger.warning("获取选中文本仅支持 Windows")
             return ""
 
-        previous_text = ""
+        previous_text: str | None = None
         foreground_hwnd = foreground_hwnd or 0
         try:
             previous_text = self._read_clipboard_text()
@@ -160,10 +160,11 @@ class SelectionAdapter(QObject):
             self._logger.error("获取选中文本失败：%s", error)
             return ""
         finally:
-            try:
-                self._write_clipboard_text(previous_text)
-            except Exception as error:
-                self._logger.warning("恢复剪贴板文本失败：%s", error)
+            if previous_text is not None:
+                try:
+                    self._write_clipboard_text(previous_text)
+                except Exception as error:
+                    self._logger.warning("恢复剪贴板文本失败：%s", error)
 
     def _get_clipboard_sequence(self) -> int:
         user32 = ctypes.windll.user32

@@ -1,4 +1,4 @@
-"""应用生命周期协调器。"""
+﻿"""应用生命周期协调器。"""
 
 from __future__ import annotations
 
@@ -6,8 +6,8 @@ import sys
 from pathlib import Path
 
 from PySide6.QtCore import QObject, QThread, QTimer
-from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QApplication
 
 from core.logger import configure_logging
 from features.translation.translation_feature import TranslationFeature
@@ -20,10 +20,10 @@ from services.model_service import ModelService
 from services.prompt_service import PromptService
 from ui.main_window import MainWindow
 from ui.popup_window import PopupWindow
+from ui.resources.assets import get_favicon
 from ui.styles.stylesheet import build_stylesheet
 from ui.tray import Tray
 from ui.workers.translation_worker import TranslationWorker
-from ui.resources.assets import get_favicon
 
 
 class Application(QObject):
@@ -66,6 +66,7 @@ class Application(QObject):
         self._selection_translation_thread: QThread | None = None
         self._selection_source_text = ""
         self._selection_translation_worker: TranslationWorker | None = None
+        self._paused = False
         self._connect_signals()
 
     def run(self) -> int:
@@ -87,6 +88,9 @@ class Application(QObject):
         self.selection_adapter.capture_finished.connect(self._on_selection_captured)
         self.main_window.close_requested.connect(self._hide_to_tray)
         self.tray.show_requested.connect(self._show_window)
+        self.tray.translate_selection_requested.connect(self._schedule_selection_translation)
+        self.tray.pause_requested.connect(self._toggle_pause)
+        self.tray.settings_requested.connect(self._show_settings_placeholder)
         self.tray.quit_requested.connect(self._quit)
         self.popup_window.retry_requested.connect(self._retry_selection_translation)
 
@@ -94,12 +98,17 @@ class Application(QObject):
         self.main_window.hide()
 
     def _show_window(self) -> None:
+        self.main_window.showNormal()
         self.main_window.show()
         self.main_window.raise_()
         self.main_window.activateWindow()
 
     def _schedule_selection_translation(self) -> None:
         """将划词读取延后到快捷键原生事件处理完成后。"""
+        if getattr(self, "_paused", False):
+            self.context.logger.info("翻译功能已暂停")
+            return
+
         foreground_hwnd = getattr(
             getattr(self, "hotkey_adapter", None), "last_foreground_window", 0
         )
@@ -107,6 +116,20 @@ class Application(QObject):
             QTimer.singleShot(0, lambda: self._translate_selection(foreground_hwnd))
         else:
             QTimer.singleShot(0, self._translate_selection)
+
+    def _toggle_pause(self) -> None:
+        """暂停或恢复全局选中翻译快捷键。"""
+        self._paused = not getattr(self, "_paused", False)
+        if self._paused:
+            self.hotkey_adapter.unregister()
+        else:
+            self.hotkey_adapter.register()
+        self.tray.set_paused(self._paused)
+        self.context.logger.info("翻译功能%s", "已暂停" if self._paused else "已恢复")
+
+    def _show_settings_placeholder(self) -> None:
+        """记录设置入口，待设置窗口任务实现后接入。"""
+        self.context.logger.info("打开设置入口")
 
     def _translate_selection(self, foreground_hwnd: int | None = None) -> None:
         """异步请求 SelectionAdapter 捕获选中文本。"""
