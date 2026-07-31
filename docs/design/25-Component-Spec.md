@@ -248,7 +248,7 @@ Radius：
 
 Padding：
 
-24px
+16px
 
 
 Border：
@@ -364,7 +364,7 @@ Primary Border
 
 高度：
 
-42px
+36px
 
 
 宽度：

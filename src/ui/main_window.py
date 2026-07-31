@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtGui import QCloseEvent, QIcon, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -34,6 +34,7 @@ class MainWindow(QMainWindow):
     """Main translation workspace."""
 
     close_requested = Signal()
+    settings_requested = Signal()
 
     def __init__(
         self,
@@ -48,7 +49,14 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("LinguaFlow")
         self.setWindowIcon(QIcon(str(get_favicon())))
         self.resize(420, 620)
-        self.setMinimumSize(420, 520)
+        self.setWindowFlags(
+            Qt.Window
+            | Qt.WindowSystemMenuHint
+            | Qt.WindowTitleHint
+            | Qt.WindowCloseButtonHint
+            | Qt.WindowMinimizeButtonHint
+        )
+        self.setFixedSize(420, 620)
         self._build_ui()
 
     def closeEvent(self, event: QCloseEvent) -> None:
@@ -182,6 +190,7 @@ class MainWindow(QMainWindow):
             "", variant="ghost", icon_path=get_icon("settings"), icon_size=(16, 16)
         )
         self.setting_button.setFixedSize(16, 16)
+        self.setting_button.clicked.connect(self.settings_requested.emit)
         layout.addWidget(self.setting_button)
         return status_bar
 

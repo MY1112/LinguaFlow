@@ -11,6 +11,7 @@ class Colors:
 
     background: str = "#F7F8FA"
     surface: str = "#FFFFFF"
+    primary_light: str = "#f0f4fb"
     primary: str = "#5B8DEF"
     text: str = "#1A1D23"
     secondary_text: str = "#6B7280"

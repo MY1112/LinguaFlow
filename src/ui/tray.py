@@ -16,11 +16,11 @@ class LFTrayMenu(QMenu):
         super().__init__(parent)
         self.open_action = self._add_action("LinguaFlow", "title_action", "logo_16")
         self._add_separator(color="#eff1f4", height=1)
-        self.open_action = self._add_action("Open", "open_action", "chat")
+        self.open_action = self._add_action("打开主窗口", "open_action", "chat")
         self.pause_action = self._add_action("暂停划词翻译", "pause_action", "pause")
-        self.settings_action = self._add_action("Settings", "settings_action", "settings")
+        self.settings_action = self._add_action("设置", "settings_action", "settings")
         self._add_separator(color="#eff1f4", height=1)
-        self.exit_action = self._add_action("Exit", "exit_action", "exit")
+        self.exit_action = self._add_action("退出", "exit_action", "exit")
 
     def _add_action(self, text: str, object_name: str, icon_name: str | None = None) -> QAction:
         action = QAction(text, self)

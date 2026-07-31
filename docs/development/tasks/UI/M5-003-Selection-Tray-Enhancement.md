@@ -53,12 +53,11 @@ src/runtime/**
 
 3. 增加：
 
-- Open
-- Translate Selection
-- Pause
-- Settings
-- About
-- Exit
+- LinguaFlow
+- 打开主窗口
+- 暂停划词翻译
+- 设置
+- 退出
 
 
 4. 保持托盘生命周期

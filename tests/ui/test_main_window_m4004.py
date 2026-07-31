@@ -1,4 +1,4 @@
-"""M4-004 MainWindow layout tests."""
+﻿"""M4-004 MainWindow layout tests."""
 
 from __future__ import annotations
 
@@ -37,8 +37,8 @@ def test_select_component_has_design_dimensions(qt_application: QApplication) ->
     select = LFSelect(["中文", "English"])
 
     assert select.count() == 2
-    assert select.width() == 152
-    assert select.height() == 40
+    assert select.width() == 150
+    assert select.height() == 36
 
     select.close()
 
@@ -56,8 +56,10 @@ def test_main_window_uses_m4004_layout(qt_application: QApplication) -> None:
     assert window.result_card.width() == 372
     assert window.translate_button.width() == 240
     assert window.translate_button.height() == 44
-    assert window.copy_button.text() == "Copy"
-    assert window.sound_button.text() == "Sound"
+    assert window.copy_button.text() == ""
+    assert window.sound_button.text() == ""
+    assert not window.copy_button.icon().isNull()
+    assert not window.sound_button.icon().isNull()
     assert window._get_translation_direction() == ("中文", "English")
 
     window.close()

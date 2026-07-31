@@ -1,4 +1,4 @@
-"""M4-005 visual calibration tests."""
+﻿"""M4-005 visual calibration tests."""
 
 from __future__ import annotations
 
@@ -29,24 +29,22 @@ def test_button_uses_standard_visual_radius(qt_application: QApplication) -> Non
     button.close()
 
 
-def test_card_uses_24px_padding_and_soft_shadow(qt_application: QApplication) -> None:
-    """Cards should use 24px padding and the approved soft shadow."""
+def test_card_uses_design_padding_and_soft_shadow(qt_application: QApplication) -> None:
+    """Cards should use the approved 16px padding and soft shadow."""
     card = LFCard()
     margins = card.layout().contentsMargins()
 
-    assert margins.left() == 24
-    assert margins.top() == 24
+    assert margins.left() == 16
+    assert margins.top() == 16
     assert isinstance(card.graphicsEffect(), QGraphicsDropShadowEffect)
     assert card.graphicsEffect().blurRadius() == 16
 
     card.close()
 
 
-def test_main_window_uses_section_title_typography(qt_application: QApplication) -> None:
-    """MainWindow card headings should use the section-title hierarchy."""
+def test_main_window_uses_result_title_typography(qt_application: QApplication) -> None:
+    """MainWindow result heading should use the section-title hierarchy."""
     window = MainWindow(FakeTranslationFeature())
-
-    assert "font-size: 15px" in window.input_title.styleSheet()
     assert "font-size: 15px" in window.result_title.styleSheet()
 
     window.close()

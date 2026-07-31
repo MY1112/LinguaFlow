@@ -29,6 +29,8 @@ class LFButton(QPushButton):
             raise ValueError(f"Unsupported button variant: {variant}")
         super().__init__(text)
         self.variant = variant
+        # 将variant保存为控件属性，QSS可以读取
+        self.setProperty("variant", variant)
         self.setMinimumHeight(42)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
@@ -64,6 +66,12 @@ class LFButton(QPushButton):
             /* ghost 增加悬浮背景，提升体验 */
             QPushButton:ghost:hover {{
                 background: rgba(128,128,128,0.08);
+            }}
+            /* ghost 选中态！侧边栏核心 */
+            QPushButton[variant="ghost"]:checked {{
+                background-color: {COLORS.primary_light};
+                color: {COLORS.primary};
+                font-weight: 500;
             }}
             QPushButton:disabled {{
                 color: rgba(120,120,120,0.45);

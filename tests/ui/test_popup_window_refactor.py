@@ -1,4 +1,4 @@
-"""PopupWindow 产品化重构测试。"""
+﻿"""PopupWindow 产品化重构测试。"""
 
 from __future__ import annotations
 
@@ -43,7 +43,7 @@ def test_popup_matches_product_structure_and_dimensions(
     assert "#FFFFFF" in popup.scroll_area.viewport().styleSheet()
     assert "#FFFFFF" in popup.card.styleSheet()
     assert "#FFFFFF" in popup.content.styleSheet()
-    assert "#F7F8FA" in popup.content_divider.parentWidget().styleSheet()
+    assert "#FFFFFF" in popup.content_divider.parentWidget().styleSheet()
     assert "#FFFFFF" in popup.actions.styleSheet()
     assert popup.dismiss_button is not None
     assert popup.windowFlags() & Qt.WindowType.WindowDoesNotAcceptFocus

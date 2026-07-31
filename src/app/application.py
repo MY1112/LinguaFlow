@@ -21,6 +21,7 @@ from services.prompt_service import PromptService
 from ui.main_window import MainWindow
 from ui.popup_window import PopupWindow
 from ui.resources.assets import get_favicon
+from ui.settings.settings_window import SettingsWindow
 from ui.styles.stylesheet import build_stylesheet
 from ui.tray import Tray
 from ui.workers.translation_worker import TranslationWorker
@@ -56,6 +57,7 @@ class Application(QObject):
         self.translation_feature = translation_feature
         self.main_window = MainWindow(translation_feature, logger)
         self.popup_window = PopupWindow(logger)
+        self.settings_window = SettingsWindow(config_service)
         self.tray = Tray()
         self.hotkey_adapter = HotkeyAdapter(
             self._schedule_selection_translation,
@@ -87,10 +89,10 @@ class Application(QObject):
     def _connect_signals(self) -> None:
         self.selection_adapter.capture_finished.connect(self._on_selection_captured)
         self.main_window.close_requested.connect(self._hide_to_tray)
+        self.main_window.settings_requested.connect(self._show_settings_window)
         self.tray.show_requested.connect(self._show_window)
-        self.tray.translate_selection_requested.connect(self._schedule_selection_translation)
         self.tray.pause_requested.connect(self._toggle_pause)
-        self.tray.settings_requested.connect(self._show_settings_placeholder)
+        self.tray.settings_requested.connect(self._show_settings_window)
         self.tray.quit_requested.connect(self._quit)
         self.popup_window.retry_requested.connect(self._retry_selection_translation)
 
@@ -127,9 +129,11 @@ class Application(QObject):
         self.tray.set_paused(self._paused)
         self.context.logger.info("翻译功能%s", "已暂停" if self._paused else "已恢复")
 
-    def _show_settings_placeholder(self) -> None:
-        """记录设置入口，待设置窗口任务实现后接入。"""
-        self.context.logger.info("打开设置入口")
+    def _show_settings_window(self) -> None:
+        """显示设置窗口并将其置于前台。"""
+        self.settings_window.show()
+        self.settings_window.raise_()
+        self.settings_window.activateWindow()
 
     def _translate_selection(self, foreground_hwnd: int | None = None) -> None:
         """异步请求 SelectionAdapter 捕获选中文本。"""
